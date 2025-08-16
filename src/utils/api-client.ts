@@ -13,6 +13,9 @@ export class ApiClient {
     this.createClient('geckoterminal', 'https://api.geckoterminal.com/api/v2');
     this.createClient('defillama', 'https://coins.llama.fi');
     this.createClient('bitquery', 'https://streaming.bitquery.io/graphql');
+    this.createClient('birdeye', 'https://public-api.birdeye.so');
+    this.createClient('pumpfun', 'https://frontend-api.pump.fun');
+    this.createClient('rugcheck', 'https://api.rugcheck.xyz');
   }
 
   private createClient(name: string, baseURL: string): void {

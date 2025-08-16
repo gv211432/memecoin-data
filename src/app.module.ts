@@ -8,6 +8,9 @@ import { CryptoCompareService } from './services/crypto-compare.service';
 import { GeckoTerminalService } from './services/gecko-terminal.service';
 import { DeFiLlamaService } from './services/defi-llama.service';
 import { BitqueryService } from './services/bitquery.service';
+import { BirdeyeService } from './services/birdeye.service';
+import { PumpFunService } from './services/pump-fun.service';
+import { RugCheckService } from './services/rugcheck.service';
 import { ApiClient } from './utils/api-client';
 
 @Module({
@@ -26,6 +29,9 @@ import { ApiClient } from './utils/api-client';
     GeckoTerminalService,
     DeFiLlamaService,
     BitqueryService,
+    BirdeyeService,
+    PumpFunService,
+    RugCheckService,
     ApiClient,
   ],
 })

@@ -2,11 +2,11 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 import { BirdeyeService } from './services/birdeye.service';
 import { BitqueryService } from './services/bitquery.service';
 import { CoinGeckoService } from './services/coin-gecko.service';
@@ -17,10 +17,13 @@ import { GeckoTerminalService } from './services/gecko-terminal.service';
 import { MemecoinService } from './services/memecoin.service';
 import { PumpFunService } from './services/pump-fun.service';
 import { RugCheckService } from './services/rugcheck.service';
+import { ApiClient } from './utils/api-client';
+
+// Load environment variables
+dotenv.config({ path: ['.env.local', '.env'] });
 
 interface ServiceInfo {
   name: string;
-  className: string;
   instance: any;
   methods: string[];
 }
@@ -32,86 +35,63 @@ interface ServiceMethod {
 
 class InteractiveCLI {
   private services: ServiceInfo[] = [];
-  private app: any;
+  private apiClient: ApiClient;
+  private configService: ConfigService;
 
   constructor() {
+    // Create manual instances
+    this.apiClient = new ApiClient();
+    this.configService = new ConfigService();
     this.loadServices();
   }
 
-  private async loadServices(): Promise<void> {
-    const servicesDir = path.join(__dirname, 'services');
+  private loadServices(): void {
+    console.log(chalk.blue('🔄 Loading services...'));
 
-    try {
-      const files = fs.readdirSync(servicesDir);
-      const serviceFiles = files.filter(file => file.endsWith('.service.ts'));
+    const serviceMap = [
+      { name: 'birdeye', service: new BirdeyeService(this.apiClient, this.configService) },
+      { name: 'bitquery', service: new BitqueryService(this.apiClient, this.configService) },
+      { name: 'coin-gecko', service: new CoinGeckoService(this.apiClient, this.configService) },
+      { name: 'crypto-compare', service: new CryptoCompareService(this.apiClient, this.configService) },
+      { name: 'defi-llama', service: new DeFiLlamaService(this.apiClient) },
+      { name: 'dex-screener', service: new DexScreenerService(this.apiClient) },
+      { name: 'gecko-terminal', service: new GeckoTerminalService(this.apiClient) },
+      {
+        name: 'memecoin', service: new MemecoinService(
+          new DexScreenerService(this.apiClient),
+          new CoinGeckoService(this.apiClient, this.configService),
+          new CryptoCompareService(this.apiClient, this.configService),
+          new GeckoTerminalService(this.apiClient),
+          new DeFiLlamaService(this.apiClient),
+          new BitqueryService(this.apiClient, this.configService),
+          new BirdeyeService(this.apiClient, this.configService),
+          new PumpFunService(this.apiClient),
+          new RugCheckService(this.apiClient)
+        )
+      },
+      { name: 'pump-fun', service: new PumpFunService(this.apiClient) },
+      { name: 'rugcheck', service: new RugCheckService(this.apiClient) },
+    ];
 
-      // Initialize NestJS app to get service instances
-      this.app = await NestFactory.createApplicationContext(AppModule);
-
-      for (const file of serviceFiles) {
-        const serviceName = file.replace('.service.ts', '');
-        const className = this.getClassNameFromFile(serviceName);
-
-        let instance: any;
-        let serviceClass: any;
-
-        switch (serviceName) {
-          case 'birdeye':
-            serviceClass = BirdeyeService;
-            break;
-          case 'bitquery':
-            serviceClass = BitqueryService;
-            break;
-          case 'coin-gecko':
-            serviceClass = CoinGeckoService;
-            break;
-          case 'crypto-compare':
-            serviceClass = CryptoCompareService;
-            break;
-          case 'defi-llama':
-            serviceClass = DeFiLlamaService;
-            break;
-          case 'dex-screener':
-            serviceClass = DexScreenerService;
-            break;
-          case 'gecko-terminal':
-            serviceClass = GeckoTerminalService;
-            break;
-          case 'memecoin':
-            serviceClass = MemecoinService;
-            break;
-          case 'pump-fun':
-            serviceClass = PumpFunService;
-            break;
-          case 'rugcheck':
-            serviceClass = RugCheckService;
-            break;
-        }
-
-        if (serviceClass) {
-          instance = this.app.get(serviceClass);
-          const methods = this.getServiceMethods(instance);
-
-          this.services.push({
-            name: serviceName,
-            className,
-            instance,
-            methods
-          });
-        }
+    for (const { name, service } of serviceMap) {
+      try {
+        const methods = this.getServiceMethods(service);
+        this.services.push({
+          name,
+          instance: service,
+          methods
+        });
+      } catch (error) {
+        console.warn(chalk.yellow(`⚠️  Failed to load ${name}: ${error instanceof Error ? error.message : error}`));
       }
-    } catch (error) {
-      console.error(chalk.red('Error loading services:'), error);
+    }
+
+    if (this.services.length === 0) {
+      console.error(chalk.red('❌ No services could be loaded'));
       process.exit(1);
     }
-  }
 
-  private getClassNameFromFile(serviceName: string): string {
-    return serviceName
-      .split('-')
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-      .join('')
-      .replace('service', 'Service');
+    console.log(chalk.green(`✅ Loaded ${this.services.length} services`));
   }
 
   private getServiceMethods(instance: any): string[] {
@@ -131,7 +111,7 @@ class InteractiveCLI {
 
   private async selectService(): Promise<ServiceInfo | null> {
     const choices = this.services.map(service => ({
-      name: chalk.cyan(service.name),
+      name: `${chalk.cyan(service.name)} ${chalk.gray(`(${service.methods.length} methods)`)}`,
       value: service
     }));
 
@@ -144,7 +124,8 @@ class InteractiveCLI {
           ...choices,
           new inquirer.Separator(),
           { name: chalk.red('Exit'), value: null }
-        ]
+        ],
+        pageSize: 15
       }
     ]);
 
@@ -157,7 +138,7 @@ class InteractiveCLI {
       return null;
     }
 
-    const choices: ServiceMethod[] = service.methods.map(method => ({
+    const choices = service.methods.map(method => ({
       name: chalk.green(method),
       value: method
     }));
@@ -172,7 +153,8 @@ class InteractiveCLI {
           new inquirer.Separator(),
           { name: chalk.red('Back'), value: null }
         ],
-        default: choices[0]?.value
+        default: choices[0]?.value,
+        pageSize: 10
       }
     ]);
 
@@ -192,7 +174,7 @@ class InteractiveCLI {
           }
           // Basic Solana address validation (base58, 32-44 chars)
           if (input.length < 32 || input.length > 44) {
-            return 'Please enter a valid Solana token address';
+            return 'Please enter a valid Solana token address (32-44 characters)';
           }
           return true;
         }
@@ -281,14 +263,11 @@ class InteractiveCLI {
 
   public async start(): Promise<void> {
     try {
-      await this.showMenu();
+      console.log(chalk.blue('🚀 Starting CLI...'));
+      this.showMenu();
     } catch (error) {
       console.error(chalk.red('CLI Error:'), error);
-    } finally {
-      if (this.app) {
-        await this.app.close();
-      }
-      process.exit(0);
+      process.exit(1);
     }
   }
 }
@@ -302,7 +281,7 @@ process.on('unhandledRejection', (reason, promise) => {
 // Start the CLI
 if (require.main === module) {
   const cli = new InteractiveCLI();
-  cli.start().catch(console.error);
+  cli.start();
 }
 
 export default InteractiveCLI;
