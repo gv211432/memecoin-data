@@ -1,6 +1,6 @@
-# Solana Memecoin API
+# Solana Memecoin Free Data API
 
-A comprehensive REST API for fetching Solana memecoin details from multiple data sources including DexScreener, CoinGecko, CryptoCompare, GeckoTerminal, DeFi Llama, and Bitquery.
+A comprehensive REST API for fetching Solana memecoin details from multiple data sources including DexScreener, CoinGecko, CryptoCompare, GeckoTerminal, DeFi Llama, and Bitquery, etc.
 
 ## Features
 
