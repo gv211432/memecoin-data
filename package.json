@@ -7,9 +7,10 @@
     "cli": "bunx ts-node --project tsconfig.json src/cli.ts",
     "build": "bunx tsc -p tsconfig.json",
     "start": "bun run dist/main.js",
-    "start:dev": "bunx ts-node --project tsconfig.json src/main.ts",
+    "start:dev": "nodemon",
     "start:watch": "bunx nodemon --watch src --ext ts --exec \"bunx ts-node --project tsconfig.json src/main.ts\"",
-    "start:debug": "bunx nodemon --config nodemon-debug.json"
+    "start:debug": "bunx nodemon --config nodemon-debug.json",
+    "test": "bun test-api.ts"
   },
   "keywords": [
     "solana",

@@ -2,6 +2,11 @@ const axios = require('axios');
 
 const API_BASE = 'http://localhost:3000/api';
 
+const SERVICES = [
+  'dexScreener', 'coinGecko', 'cryptoCompare', 'geckoTerminal',
+  'defiLlama', 'bitquery', 'birdeye', 'pumpFun', 'rugCheck'
+];
+
 async function testAPI() {
   console.log('🧪 Testing Solana Memecoin API...\n');
 
@@ -29,15 +34,9 @@ async function testAPI() {
     console.log(`- Price: $${details.data.data.tokenDetails.price || 'N/A'}`);
     console.log(`- Market Cap: $${details.data.data.tokenDetails.marketCap?.toLocaleString() || 'N/A'}`);
 
-    // Show success rates
-    const sources = [
-      'dexScreener', 'coinGecko', 'cryptoCompare',
-      'geckoTerminal', 'defiLlama', 'bitquery'
-    ];
-
-    sources.forEach(source => {
-      const success = details.data.data[source]?.success;
-      console.log(`- ${source}: ${success ? '✅' : '❌'}`);
+    SERVICES.forEach(service => {
+      const success = details.data.data[service]?.success;
+      console.log(`- ${service}: ${success ? '✅' : '❌'}`);
     });
 
   } catch (error) {
