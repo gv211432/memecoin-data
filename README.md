@@ -6,7 +6,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/gv211432/memecoin-data">
-    <img src="memecoin-data.png" alt="Logo" width="120" height="120" >
+    <img src="memecoin-data.png" alt="Logo" width="190" height="190" >
   </a>
   
   <h3 align="center"><b>Memecoin Data</b></h3>
@@ -14,14 +14,14 @@
   <p align="center">
    A comprehensive REST API for fetching Solana memecoin details from multiple data sources including DexScreener, CoinGecko, CryptoCompare, GeckoTerminal, DeFi Llama, and Bitquery, etc.
     <br />
-    <a href="#"><strong>Explore the docs »</strong></a>
+    <a style="color: #BAA886" href="#"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="#">Get Started</a>
+    <a style="color:#BAA886" href="#">Get Started</a>
     ·
-    <a href="https://github.com/gv211432/boxes/issues">Report Bug</a>
+    <a style="color:#BAA886" href="https://github.com/gv211432/boxes/issues">Report Bug</a>
     ·
-    <a href="https://github.com/gv211432/boxes/issues">Request Feature</a>
+    <a style="color:#BAA886" href="https://github.com/gv211432/boxes/issues">Request Feature</a>
   </p>
 </div>
 
