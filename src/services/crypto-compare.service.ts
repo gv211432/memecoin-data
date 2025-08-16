@@ -16,14 +16,15 @@ export class CryptoCompareService {
 
   async getTokenData(tokenSymbol: string): Promise<APIResponse<CryptoCompareData>> {
     const params: any = {
-      fsym: tokenSymbol.toUpperCase(),
-      tsym: 'USD',
+      fsyms: tokenSymbol.toUpperCase(),
+      tsyms: 'USD',
     };
 
     if (this.apiKey) {
       params.api_key = this.apiKey;
     }
 
+    // Use the pricemultifull endpoint directly for comprehensive data
     const result = await this.apiClient.safeGet<any>(
       'cryptocompare',
       '/data/pricemultifull',
@@ -31,10 +32,42 @@ export class CryptoCompareService {
     );
 
     if (!result.success || !result.data || !result.data.RAW || !result.data.RAW[tokenSymbol.toUpperCase()]) {
+      // Fallback to simple price endpoint if pricemultifull fails
+      const fallbackParams: any = {
+        fsym: tokenSymbol.toUpperCase(),
+        tsyms: 'USD',
+      };
+
+      if (this.apiKey) {
+        fallbackParams.api_key = this.apiKey;
+      }
+
+      const fallbackResult = await this.apiClient.safeGet<any>(
+        'cryptocompare',
+        '/data/price',
+        fallbackParams,
+      );
+
+      if (!fallbackResult.success || !fallbackResult.data || !fallbackResult.data.USD) {
+        return {
+          success: false,
+          data: null,
+          error: fallbackResult.error || 'Token not found on CryptoCompare',
+          timestamp: new Date(),
+        };
+      }
+
       return {
-        success: false,
-        data: null,
-        error: result.error || 'Token not found on CryptoCompare',
+        success: true,
+        data: {
+          PRICE: fallbackResult.data.USD,
+          MKTCAP: null,
+          TOTALVOLUME24HTO: null,
+          CHANGEPCT24HOUR: null,
+          HIGH24HOUR: null,
+          LOW24HOUR: null,
+          SUPPLY: null,
+        },
         timestamp: new Date(),
       };
     }
