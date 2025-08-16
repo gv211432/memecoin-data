@@ -6,6 +6,43 @@ This document provides comprehensive instructions for testing the Solana Memecoi
 
 The project uses Jest as the testing framework with TypeScript support. All tests are organized in the `test/` directory with separate folders for unit tests and integration tests.
 
+## 🎯 CLI Test Runner
+
+A convenient CLI tool is provided to easily run specific service tests:
+
+### Usage
+
+```bash
+# Run the interactive CLI
+npx ts-node test/main.ts
+
+# Or make it executable
+chmod +x test/main.ts
+./test/main.ts
+```
+
+### CLI Features
+- Lists all available test services with numbered indexes
+- Option to run all tests or specific service tests
+- Interactive selection interface
+- Direct integration with Jest
+
+### Example CLI Output
+```
+🎯 Solana Memecoin API Test Runner
+
+🧪 Available Test Services
+
+0. Run all tests
+1. birdeye.service
+2. dex-screener.service
+3. coin-gecko.service
+4. memecoin.service
+5. rugcheck.service
+
+Enter the number of the service to test (or 0 for all):
+```
+
 ## Test Structure
 
 ```
@@ -18,6 +55,7 @@ test/
 │       ├── memecoin.service.spec.ts
 │       └── rugcheck.service.spec.ts
 ├── integration/
+├── main.ts              # CLI tool
 ├── mocks/
 │   └── axios.mock.ts
 ├── setup.ts
@@ -56,6 +94,15 @@ npm test -- birdeye.service.spec.ts
 npm run test:debug
 ```
 
+### Using the CLI Tool
+```bash
+# Interactive mode
+npx ts-node test/main.ts
+
+# Run specific service via CLI
+npx ts-node test/main.ts && echo "1" | ./test/main.ts  # Runs birdeye tests
+```
+
 ## Service Testing Guide
 
 ### 1. BirdeyeService
@@ -74,7 +121,7 @@ npm test -- birdeye.service.spec.ts
 ```
 
 ### 2. DexScreenerService
-**File**: `test/unit/services/dex-sccreener.service.spec.ts`
+**File**: `test/unit/services/dex-screener.service.spec.ts`
 
 **Key Features Tested**:
 - Token pair data retrieval
@@ -132,6 +179,26 @@ npm test -- memecoin.service.spec.ts
 npm test -- rugcheck.service.spec.ts
 ```
 
+## Quick Start with CLI
+
+1. **List available tests**:
+   ```bash
+   npx ts-node test/main.ts
+   ```
+
+2. **Run specific service**:
+   ```bash
+   # After running CLI, enter service number
+   npx ts-node test/main.ts
+   # Then enter: 1 (for birdeye tests)
+   ```
+
+3. **Run all tests**:
+   ```bash
+   npx ts-node test/main.ts
+   # Then enter: 0
+   ```
+
 ## Testing Best Practices
 
 ### 1. Mocking External APIs
@@ -166,54 +233,6 @@ COINGECKO_API_KEY=test_coingecko_key
 # Test Configuration
 TEST_TIMEOUT=10000
 MOCK_API_RESPONSES=true
-```
-
-## Writing New Tests
-
-### Service Test Template
-```typescript
-import { Test, TestingModule } from '@nestjs/testing';
-import { YourService } from '../../../src/services/your.service';
-
-describe('YourService', () => {
-  let service: YourService;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [YourService],
-    }).compile();
-
-    service = module.get<YourService>(YourService);
-    jest.clearAllMocks();
-  });
-
-  describe('methodName', () => {
-    it('should do something successfully', async () => {
-      // Test implementation
-    });
-
-    it('should handle errors gracefully', async () => {
-      // Error handling test
-    });
-  });
-});
-```
-
-### Mocking Dependencies
-```typescript
-const mockDependency = {
-  methodName: jest.fn(),
-};
-
-const module: TestingModule = await Test.createTestingModule({
-  providers: [
-    YourService,
-    {
-      provide: DependencyService,
-      useValue: mockDependency,
-    },
-  ],
-}).compile();
 ```
 
 ## Debugging Tests

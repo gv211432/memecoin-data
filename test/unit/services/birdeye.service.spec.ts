@@ -55,7 +55,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await service.getTokenData('token-address');
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toEqual({
         price: 0.001234,
@@ -80,7 +80,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockRejectedValue(new Error('Network error'));
 
       const result = await service.getTokenData('invalid-address');
-      
+
       expect(result.success).toBe(false);
       expect(result.data).toBeNull();
       expect(result.error).toBe('Network error');
@@ -88,7 +88,7 @@ describe('BirdeyeService', () => {
 
     it('should handle missing API key', async () => {
       mockConfigService.get.mockReturnValue(undefined);
-      
+
       const mockResponse = {
         data: {
           success: true,
@@ -110,7 +110,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await service.getTokenData('token-address');
-      
+
       expect(result.success).toBe(true);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.any(String),
@@ -138,7 +138,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await service.getPriceHistory('token-address', 7);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(2);
       expect(result.data[0]).toEqual({
@@ -159,7 +159,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await service.getPriceHistory('token-address');
-      
+
       expect(result.success).toBe(false);
       expect(result.data).toBeNull();
       expect(result.error).toBe('No price history data available');
@@ -182,7 +182,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await service.getTokenSecurity('token-address');
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockResponse.data);
     });
@@ -191,7 +191,7 @@ describe('BirdeyeService', () => {
       mockedAxios.get.mockRejectedValue(new Error('API limit exceeded'));
 
       const result = await service.getTokenSecurity('token-address');
-      
+
       expect(result.success).toBe(false);
       expect(result.data).toBeNull();
       expect(result.error).toBe('API limit exceeded');
