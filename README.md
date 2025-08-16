@@ -189,6 +189,39 @@ Most APIs have generous free tiers:
 3. Add tests for new functionality
 4. Submit a pull request
 
+<br/>
+
+---
+
+✅ **Integrated now** → Already usable in your project <br/>
+⚠️ **Planned soon** → Useful additions (depending on scaling + limits)
+
+---
+
+# 📊 Free APIs for Memecoin Data Integration
+
+| API / Source             | Purpose (Key Data Provided)                             | Status |
+| ------------------------ | ------------------------------------------------------- | ------ |
+| **DexScreener API**      | Real-time token prices, volume, liquidity, MC           | ✅     |
+| **CoinGecko API**        | Pricing, MC, volume, supply, historical                 | ✅     |
+| **CryptoCompare API**    | Market data, pricing, trades                            | ✅     |
+| **GeckoTerminal API**    | DEX token data, prices, pairs                           | ✅     |
+| **DeFi Llama API**       | TVL, protocol analytics, chains                         | ✅     |
+| **Bitquery API**         | On-chain transactions, token transfers                  | ✅     |
+| **Birdeye API**          | Solana-specific token data: holders, liquidity, wallets | ✅     |
+| **RugCheck API**         | Token security: LP lock %, mintable, freeze flags       | ✅     |
+| **PumpFun API (scrape)** | Origin of memecoins, metadata                           | ✅     |
+| **CoinMarketCap API**    | Market cap, volume, supply, historical data             | ⚠️     |
+| **PancakeSwap API**      | BSC token prices, LP info, trades                       | ⚠️     |
+| **Messari API**          | Fundamentals, metrics, analytics                        | ⚠️     |
+| **Nomics API**           | MC, price history, order book                           | ⚠️     |
+| **Token Metrics API**    | On-chain token performance & metrics                    | ⚠️     |
+| **Solana Tracker API**   | Solana token supply, holders, distribution              | ⚠️     |
+| **Moralis API**          | Multi-chain token balances, holders                     | ⚠️     |
+| **Jupiter API**          | Solana liquidity routing, price quotes                  | ⚠️     |
+| **Helius API**           | Solana-specific analytics, metadata, RPC indexing       | ⚠️     |
+
+
 ## License
 
 MIT License - see LICENSE file for details

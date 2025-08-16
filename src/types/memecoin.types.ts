@@ -123,5 +123,8 @@ export interface MemecoinAggregateData {
   solanaTracker: APIResponse<SolanaTrackerData>;
   defiLlama: APIResponse<DeFiLlamaData>;
   bitquery: APIResponse<BitqueryData>;
+  birdeye: APIResponse<any>;
+  pumpFun: APIResponse<any>;
+  rugCheck: APIResponse<any>;
   priceHistory: APIResponse<PriceHistory[]>;
 }

@@ -5,6 +5,9 @@ import { CryptoCompareService } from './crypto-compare.service';
 import { GeckoTerminalService } from './gecko-terminal.service';
 import { DeFiLlamaService } from './defi-llama.service';
 import { BitqueryService } from './bitquery.service';
+import { BirdeyeService } from './birdeye.service';
+import { PumpFunService } from './pump-fun.service';
+import { RugCheckService } from './rugcheck.service';
 import { MemecoinAggregateData, TokenDetails, APIResponse } from '../types/memecoin.types';
 
 @Injectable()
@@ -16,7 +19,10 @@ export class MemecoinService {
     private readonly geckoTerminalService: GeckoTerminalService,
     private readonly defiLlamaService: DeFiLlamaService,
     private readonly bitqueryService: BitqueryService,
-  ) {}
+    private readonly birdeyeService: BirdeyeService,
+    private readonly pumpFunService: PumpFunService,
+    private readonly rugCheckService: RugCheckService,
+  ) { }
 
   async getTokenDetails(tokenAddress: string): Promise<MemecoinAggregateData> {
     // Fetch all data in parallel
@@ -27,6 +33,9 @@ export class MemecoinService {
       geckoTerminal,
       defiLlama,
       bitquery,
+      birdeye,
+      pumpFun,
+      rugCheck,
     ] = await Promise.all([
       this.dexScreenerService.getTokenData(tokenAddress),
       this.coinGeckoService.getTokenData(tokenAddress),
@@ -34,6 +43,9 @@ export class MemecoinService {
       this.geckoTerminalService.getTokenData(tokenAddress),
       this.defiLlamaService.getTokenData(tokenAddress),
       this.bitqueryService.getTokenData(tokenAddress),
+      this.birdeyeService.getTokenData(tokenAddress),
+      this.pumpFunService.getTokenData(tokenAddress),
+      this.rugCheckService.getTokenSummary(tokenAddress),
     ]);
 
     // Get price history from multiple sources
@@ -45,6 +57,8 @@ export class MemecoinService {
       coinGecko.data,
       geckoTerminal.data,
       dexScreener.data,
+      birdeye.data,
+      pumpFun.data,
     );
 
     return {
@@ -56,6 +70,9 @@ export class MemecoinService {
       solanaTracker: { success: false, data: null, error: 'Not implemented', timestamp: new Date() },
       defiLlama,
       bitquery,
+      birdeye,
+      pumpFun,
+      rugCheck,
       priceHistory,
     };
   }
@@ -65,19 +82,25 @@ export class MemecoinService {
     coinGeckoData?: any,
     geckoTerminalData?: any,
     dexScreenerData?: any,
+    birdeyeData?: any,
+    pumpFunData?: any,
   ): TokenDetails {
     return {
       address,
-      name: coinGeckoData?.name || 'Unknown Token',
-      symbol: coinGeckoData?.symbol?.toUpperCase() || 'UNKNOWN',
+      name: coinGeckoData?.name || pumpFunData?.name || birdeyeData?.name || 'Unknown Token',
+      symbol: coinGeckoData?.symbol?.toUpperCase() || pumpFunData?.symbol?.toUpperCase() || birdeyeData?.symbol?.toUpperCase() || 'UNKNOWN',
       decimals: 6, // Default for Solana tokens
-      totalSupply: coinGeckoData?.total_supply?.toString() || undefined,
-      marketCap: coinGeckoData?.market_cap || geckoTerminalData?.market_cap || dexScreenerData?.marketCap,
-      price: coinGeckoData?.current_price || geckoTerminalData?.price || dexScreenerData?.price,
-      priceChange24h: coinGeckoData?.price_change_percentage_24h || geckoTerminalData?.price_change_24h || dexScreenerData?.priceChange24h,
-      volume24h: coinGeckoData?.total_volume || geckoTerminalData?.volume_24h || dexScreenerData?.volume24h,
-      image: coinGeckoData?.image,
-      description: coinGeckoData?.description?.en || undefined,
+      totalSupply: coinGeckoData?.total_supply?.toString() || pumpFunData?.totalSupply || undefined,
+      marketCap: coinGeckoData?.market_cap || geckoTerminalData?.market_cap || dexScreenerData?.marketCap || birdeyeData?.marketCap || pumpFunData?.marketCap,
+      price: coinGeckoData?.current_price || geckoTerminalData?.price || dexScreenerData?.price || birdeyeData?.price || pumpFunData?.price,
+      priceChange24h: coinGeckoData?.price_change_percentage_24h || geckoTerminalData?.price_change_24h || dexScreenerData?.priceChange24h || birdeyeData?.priceChange24h,
+      volume24h: coinGeckoData?.total_volume || geckoTerminalData?.volume_24h || dexScreenerData?.volume24h || birdeyeData?.volume24h,
+      image: coinGeckoData?.image || pumpFunData?.image || birdeyeData?.image,
+      description: coinGeckoData?.description?.en || pumpFunData?.description || undefined,
+      website: pumpFunData?.website || undefined,
+      twitter: pumpFunData?.twitter || undefined,
+      telegram: pumpFunData?.telegram || undefined,
+      createdAt: pumpFunData?.createdAt || undefined,
       updatedAt: new Date(),
     };
   }
@@ -89,6 +112,8 @@ export class MemecoinService {
       () => this.coinGeckoService.getPriceHistory(tokenAddress),
       () => this.geckoTerminalService.getPriceHistory(tokenAddress),
       () => this.defiLlamaService.getPriceHistory(tokenAddress),
+      () => this.birdeyeService.getPriceHistory(tokenAddress),
+      () => this.pumpFunService.getPriceHistory(tokenAddress),
     ];
 
     for (const source of sources) {
@@ -112,7 +137,7 @@ export class MemecoinService {
 
   async getTokenSummary(tokenAddress: string): Promise<any> {
     const data = await this.getTokenDetails(tokenAddress);
-    
+
     // Calculate success rate
     const sources = [
       data.dexScreener,
@@ -121,8 +146,11 @@ export class MemecoinService {
       data.geckoTerminal,
       data.defiLlama,
       data.bitquery,
+      data.birdeye,
+      data.pumpFun,
+      data.rugCheck,
     ];
-    
+
     const successfulSources = sources.filter(s => s.success).length;
     const totalSources = sources.length;
     const successRate = (successfulSources / totalSources) * 100;
@@ -144,7 +172,11 @@ export class MemecoinService {
         geckoTerminal: data.geckoTerminal.success,
         defiLlama: data.defiLlama.success,
         bitquery: data.bitquery.success,
+        birdeye: data.birdeye.success,
+        pumpFun: data.pumpFun.success,
+        rugCheck: data.rugCheck.success,
       },
+      security: data.rugCheck.data?.security || null,
       timestamp: new Date(),
     };
   }
