@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable CORS
   app.enableCors({
     origin: '*',
@@ -27,7 +27,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  
+
   console.log(`🚀 Solana Memecoin API is running on: http://localhost:${port}`);
   console.log(`📊 Health check: http://localhost:${port}/api/memecoin/health`);
 }

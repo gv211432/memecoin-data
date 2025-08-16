@@ -67,12 +67,12 @@ export interface CoinGeckoData {
 
 export interface CryptoCompareData {
   PRICE: number;
-  MKTCAP: number;
-  TOTALVOLUME24HTO: number;
-  CHANGEPCT24HOUR: number;
-  HIGH24HOUR: number;
-  LOW24HOUR: number;
-  SUPPLY: number;
+  MKTCAP: number | null;
+  TOTALVOLUME24HTO: number | null;
+  CHANGEPCT24HOUR: number | null;
+  HIGH24HOUR: number | null;
+  LOW24HOUR: number | null;
+  SUPPLY: number | null;
 }
 
 export interface GeckoTerminalData {

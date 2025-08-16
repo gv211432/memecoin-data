@@ -1,8 +1,11 @@
-import { IsString, IsNotEmpty, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class TokenRequestDto {
+  // @ts-ignore
   @IsString()
+  // @ts-ignore
   @IsNotEmpty()
+  // @ts-ignore
   @Matches(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/, {
     message: 'Invalid Solana address format',
   })

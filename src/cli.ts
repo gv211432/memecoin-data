@@ -18,20 +18,10 @@ import { MemecoinService } from './services/memecoin.service';
 import { PumpFunService } from './services/pump-fun.service';
 import { RugCheckService } from './services/rugcheck.service';
 import { ApiClient } from './utils/api-client';
+import { ServiceInfo } from './types/cli.types';
 
 // Load environment variables
 dotenv.config({ path: ['.env.local', '.env'] });
-
-interface ServiceInfo {
-  name: string;
-  instance: any;
-  methods: string[];
-}
-
-interface ServiceMethod {
-  name: string;
-  value: string;
-}
 
 class InteractiveCLI {
   private services: ServiceInfo[] = [];
@@ -45,7 +35,7 @@ class InteractiveCLI {
     this.loadServices();
   }
 
-  private loadServices(): void {
+  private async loadServices(): Promise<void> {
     console.log(chalk.blue('🔄 Loading services...'));
 
     const serviceMap = [
@@ -82,7 +72,7 @@ class InteractiveCLI {
           methods
         });
       } catch (error) {
-        console.warn(chalk.yellow(`⚠️  Failed to load ${name}: ${error instanceof Error ? error.message : error}`));
+        console.warn(chalk.yellow(`⚠️ Failed to load ${name}: ${error instanceof Error ? error.message : error}`));
       }
     }
 

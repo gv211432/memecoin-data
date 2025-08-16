@@ -35,4 +35,4 @@ import { ApiClient } from './utils/api-client';
     ApiClient,
   ],
 })
-export class AppModule {}
+export class AppModule { }
